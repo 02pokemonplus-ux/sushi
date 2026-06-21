@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>壽司店單字學習工具</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --indigo: #1B6FA8;
+    --indigo-deep: #145480;
+    --bg: #F2F8FA;
+    --card: #FFFFFF;
+    --card-alt: #E3F1F5;
+    --line: #D3E6EC;
+    --ink: #1B2A30;
+    --ink-soft: #5D7986;
+    --muted: #93AEB8;
+    --accent: #1B6FA8;
+    --accent-soft: #D7E9F0;
+    --on-accent: #F2F8FA;
+    --r-sm: 10px;
+    --r-md: 16px;
+    --r-lg: 22px;
+    --r-pill: 999px;
+  }
+
+  html[data-theme="dark"] {
+    --indigo: #6FC2E0;
+    --indigo-deep: #4FA3C4;
+    --bg: #10181C;
+    --card: #16222A;
+    --card-alt: #1C2C35;
+    --line: #283944;
+    --ink: #DCEAF0;
+    --ink-soft: #93B0BC;
+    --muted: #5E7A86;
+    --accent: #6FC2E0;
+    --accent-soft: #233844;
+    --on-accent: #0F1B20;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
+    min-height: 100vh;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  /* ---------- Header ---------- */
+  .topbar {
+    background: var(--indigo);
+    color: var(--on-accent);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-left { display: flex; align-items: baseline; gap: 10px; }
+
+  .topbar-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .topbar-sub {
+    font-size: 12px;
+    color: rgba(242,248,250,0.65);
+    letter-spacing: 0.02em;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--r-pill);
+    border: 1px solid rgba(242,248,250,0.25);
+    background: rgba(242,248,250,0.08);
+    color: #F2F8FA;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .theme-toggle:hover {
+    background: rgba(242,248,250,0.16);
+    border-color: rgba(242,248,250,0.4);
+  }
+  .theme-toggle svg { width: 17px; height: 17px; }
+
+  /* ---------- Tab nav ---------- */
+  .tabbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 16px 10px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    user-select: none;
+  }
+  .tab-item:hover { color: var(--ink); }
+  .tab-item.active {
+    color: var(--ink);
+    font-weight: 700;
+    border-bottom-color: var(--indigo);
+  }
+
+  .subtabbar {
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    overflow-x: auto;
+    padding: 0 12px;
+  }
+  .subtab-item {
+    padding: 11px 16px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    user-select: none;
+  }
+  .subtab-item:hover { color: var(--ink); }
+  .subtab-item.active {
+    color: var(--indigo);
+    font-weight: 700;
+    border-bottom-color: var(--indigo);
+  }
+
+  /* ---------- Inner tab ---------- */
+  .inner-tabbar {
+    display: inline-flex;
+    gap: 4px;
+    background: var(--card-alt);
+    border-radius: var(--r-pill);
+    padding: 4px;
+    margin-bottom: 22px;
+  }
+  .inner-tab-item {
+    padding: 8px 20px;
+    border-radius: var(--r-pill);
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .inner-tab-item:hover { color: var(--ink); }
+  .inner-tab-item.active {
+    background: var(--indigo);
+    color: var(--on-accent);
+    font-weight: 700;
+  }
+
+  .inner-view { display: none; }
+  .inner-view.active { display: block; }
+
+  /* ---------- Main ---------- */
+  .main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 22px 24px 80px;
+  }
+
+  .section-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* ---------- View switching ---------- */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ====== STUDY (flashcard) view ====== */
+  .study-layout {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .card-panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 48px 40px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .card-index-tag {
+    position: absolute;
+    top: 20px;
+    left: 22px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .card-kanji {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .card-kana {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+
+  .card-zh {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--indigo);
+    min-height: 30px;
+  }
+
+  .card-hint {
+    margin-top: 22px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .card-nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  .nav-btn {
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    width: 38px;
+    height: 38px;
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-btn:hover { border-color: var(--indigo); color: var(--indigo); }
+
+  .nav-counter {
+    font-size: 13px;
+    color: var(--muted);
+    min-width: 56px;
+    text-align: center;
+  }
+
+  .shuffle-btn {
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    padding: 0 18px;
+    height: 38px;
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .shuffle-btn:hover { border-color: var(--indigo); color: var(--indigo); }
+
+  /* ====== Reference table view ====== */
+  .filter-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .filter-item {
+    padding: 9px 20px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .filter-item:hover { border-color: var(--indigo); color: var(--ink); }
+  .filter-item.active {
+    background: var(--indigo);
+    border-color: var(--indigo);
+    color: var(--on-accent);
+    font-weight: 700;
+  }
+
+  .ref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .ref-cell {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 16px 20px;
+    min-height: 56px;
+    font-size: 15px;
+    color: var(--ink);
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .ref-cell:hover { border-color: var(--indigo); }
+  .ref-cell-kanji { font-weight: 700; }
+  .ref-cell.revealed {
+    background: var(--card-alt);
+    border-color: var(--indigo);
+  }
+  .ref-cell-kana { font-size: 13px; color: var(--ink-soft); }
+  .ref-cell-zh { font-size: 16px; font-weight: 700; color: var(--ink); }
+
+  /* ====== Quiz view ====== */
+  .quiz-wrap { max-width: 560px; margin: 0 auto; }
+
+  .quiz-panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 40px 32px;
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .quiz-question-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .quiz-kanji { font-size: 32px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .quiz-kana { font-size: 14px; color: var(--ink-soft); }
+
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .quiz-option {
+    padding: 16px 12px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    font-size: 14px;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .quiz-option:hover:not(:disabled) { border-color: var(--indigo); }
+  .quiz-option.correct { background: #DCEEDD; border-color: #4C8C5C; color: #2C5536; }
+  .quiz-option.wrong { background: #F3DCE0; border-color: #B55A6E; color: #7A2F3D; }
+  .quiz-option:disabled { cursor: default; }
+
+  .quiz-feedback {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--indigo);
+    min-height: 18px;
+  }
+
+  .quiz-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  .quiz-score { font-size: 13px; color: var(--ink-soft); }
+  .quiz-score strong { color: var(--indigo); }
+
+  .next-btn {
+    padding: 9px 22px;
+    border-radius: var(--r-pill);
+    background: var(--indigo);
+    color: var(--on-accent);
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .next-btn:disabled { opacity: 0.35; cursor: default; }
+
+  .quiz-result { text-align: center; padding: 50px 30px; }
+  .quiz-result .big-score { font-size: 46px; font-weight: 700; color: var(--indigo); margin-bottom: 8px; }
+  .quiz-result .result-msg { color: var(--ink-soft); font-size: 14px; margin-bottom: 22px; }
+  .restart-btn {
+    padding: 10px 28px;
+    border-radius: var(--r-pill);
+    background: var(--indigo);
+    color: var(--on-accent);
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* ====== Confusables view ====== */
+  .confuse-row {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 18px 22px;
+    margin-bottom: 12px;
+  }
+  .confuse-title { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .confuse-items { display: flex; gap: 12px; flex-wrap: wrap; }
+  .confuse-pill {
+    background: var(--card-alt);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+  .confuse-pill .k { font-weight: 700; color: var(--ink); }
+  .confuse-pill .z { font-size: 12px; color: var(--muted); margin-left: 6px; }
+
+  /* ====== Phrase view ====== */
+  .phrase-toolbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 4px;
+  }
+  .phrase-toggle-group {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .phrase-toggle-btn {
+    padding: 7px 16px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .phrase-toggle-btn:hover { border-color: var(--indigo); color: var(--ink); }
+  .phrase-toggle-btn[data-on="true"] {
+    background: var(--indigo);
+    border-color: var(--indigo);
+    color: var(--on-accent);
+    font-weight: 700;
+  }
+
+  .scene-tabbar {
+    display: flex;
+    gap: 8px;
+    margin: 0 auto 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 680px;
+  }
+  .scene-tab-item {
+    padding: 9px 20px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .scene-tab-item:hover { border-color: var(--indigo); color: var(--ink); }
+  .scene-tab-item.active {
+    background: var(--indigo);
+    border-color: var(--indigo);
+    color: var(--on-accent);
+    font-weight: 700;
+  }
+
+  .scenario-tabbar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 0 auto 24px;
+    max-width: 680px;
+  }
+  .scenario-tab-item {
+    padding: 9px 14px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .scenario-tab-item:hover { border-color: var(--indigo); color: var(--ink); }
+  .scenario-tab-item.active {
+    background: var(--indigo);
+    border-color: var(--indigo);
+    color: var(--on-accent);
+    font-weight: 700;
+  }
+
+  .play-all-row {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 18px;
+    max-width: 680px;
+  }
+  .play-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--indigo);
+    background: var(--card);
+    color: var(--indigo);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .play-all-btn:hover { background: var(--accent-soft); }
+  .play-all-btn.active {
+    background: var(--indigo);
+    color: var(--on-accent);
+  }
+  .play-all-btn svg { width: 14px; height: 14px; }
+
+  .phrase-row.speaking .phrase-bubble {
+    border-color: var(--indigo);
+    box-shadow: 0 0 0 2px var(--accent-soft);
+  }
+
+  .phrase-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .phrase-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .phrase-row.staff { justify-content: flex-start; }
+  .phrase-row.customer { justify-content: flex-end; }
+
+  .speaker-tag {
+    flex-shrink: 0;
+    width: 52px;
+    text-align: center;
+    font-size: 11px;
+    padding: 4px 0;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .phrase-row.staff .speaker-tag {
+    background: var(--accent-soft);
+    color: var(--indigo);
+  }
+  .phrase-row.customer .speaker-tag {
+    background: var(--card-alt);
+    color: var(--ink-soft);
+    order: 2;
+  }
+
+  .phrase-bubble {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+    max-width: 480px;
+  }
+  .phrase-row.staff .phrase-bubble {
+    border-top-left-radius: 4px;
+  }
+  .phrase-row.customer .phrase-bubble {
+    border-top-right-radius: 4px;
+    background: var(--card-alt);
+  }
+
+  .phrase-jp-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .phrase-jp {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  .phrase-jp .furi {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .phrase-jp .furi::after {
+    content: attr(data-kana);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    margin-bottom: 6px;
+    background: var(--indigo);
+    color: var(--on-accent);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 9px;
+    border-radius: var(--r-sm);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .phrase-jp .furi:hover::after,
+  .phrase-jp .furi.show-tooltip::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .speak-btn {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .speak-btn:hover { border-color: var(--indigo); color: var(--indigo); }
+  .speak-btn.playing { background: var(--indigo); border-color: var(--indigo); color: var(--on-accent); }
+  .speak-btn svg { width: 13px; height: 13px; }
+
+  .phrase-zh { font-size: 13px; color: var(--ink-soft); display: none; }
+
+  body.show-zh .phrase-zh { display: block; }
+
+  @media (max-width: 860px) {
+    .quiz-options { grid-template-columns: 1fr; }
+    .ref-grid { grid-template-columns: 1fr; }
+  }
+
+  :focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-title">壽司店單字學習工具</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-sub">速查 ・ 單字卡 ・ 測驗 ・ 易混淆點</span>
+    <button class="theme-toggle" id="themeToggle" title="切換晝夜模式" aria-label="切換晝夜模式">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4.5"></circle>
+        <line x1="12" y1="2.5" x2="12" y2="5"></line>
+        <line x1="12" y1="19" x2="12" y2="21.5"></line>
+        <line x1="4.2" y1="4.2" x2="6" y2="6"></line>
+        <line x1="18" y1="18" x2="19.8" y2="19.8"></line>
+        <line x1="2.5" y1="12" x2="5" y2="12"></line>
+        <line x1="19" y1="12" x2="21.5" y2="12"></line>
+        <line x1="4.2" y1="19.8" x2="6" y2="18"></line>
+        <line x1="18" y1="6" x2="19.8" y2="4.2"></line>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<nav class="tabbar" id="modeTabbar">
+  <div class="tab-item active" data-mode="ref">速查表</div>
+  <div class="tab-item" data-mode="study">單字卡</div>
+  <div class="tab-item" data-mode="phrase">常用句</div>
+</nav>
+
+<nav class="subtabbar" id="catTabbar"></nav>
+
+<main class="main">
+
+  <!-- ============ REF (速査表) VIEW ============ -->
+  <section class="view active" id="view-ref">
+    <nav class="inner-tabbar" id="refInnerTabbar">
+      <div class="inner-tab-item active" data-submode="lookup">查詢</div>
+      <div class="inner-tab-item" data-submode="confuse">易混淆</div>
+    </nav>
+
+    <!-- 查詢子視圖 -->
+    <div class="inner-view active" id="ref-lookup">
+      <p class="section-label">點擊單字查看假名與中文意思</p>
+      <div class="filter-row" id="filterRow" style="display:none;"></div>
+      <div class="ref-grid" id="refGrid"></div>
+    </div>
+
+    <!-- 易混淆子視圖 -->
+    <div class="inner-view" id="ref-confuse">
+      <p class="section-label">容易混淆的單字組</p>
+      <div id="confuseList"></div>
+    </div>
+  </section>
+
+  <!-- ============ STUDY (flashcard) VIEW ============ -->
+  <section class="view" id="view-study">
+    <nav class="inner-tabbar" id="studyInnerTabbar">
+      <div class="inner-tab-item active" data-submode="memorize">記憶</div>
+      <div class="inner-tab-item" data-submode="quiz">測驗</div>
+    </nav>
+
+    <!-- 記憶子視圖 -->
+    <div class="inner-view active" id="study-memorize">
+      <p class="section-label">點擊卡片查看中文意思</p>
+      <div class="study-layout">
+        <div class="card-panel" id="flashcard">
+          <span class="card-index-tag" id="cardIndexTag">1 / 10</span>
+          <div class="card-kanji" id="cardKanji"></div>
+          <div class="card-kana" id="cardKana"></div>
+          <div class="card-zh" id="cardZh"></div>
+          <div class="card-hint" id="cardHint">點擊卡片看中文</div>
+        </div>
+        <div class="card-nav-row">
+          <button class="nav-btn" id="prevBtn">‹</button>
+          <span class="nav-counter" id="navCounter">1 / 10</span>
+          <button class="nav-btn" id="nextBtn">›</button>
+          <button class="shuffle-btn" id="shuffleBtn">隨機排序</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 測驗子視圖 -->
+    <div class="inner-view" id="study-quiz">
+      <div class="quiz-wrap">
+        <div id="quizContent">
+          <div class="quiz-panel">
+            <div class="quiz-question-label">這個單字的中文意思是？</div>
+            <div class="quiz-kanji" id="quizKanji"></div>
+            <div class="quiz-kana" id="quizKana"></div>
+          </div>
+          <div class="quiz-options" id="quizOptions"></div>
+          <div class="quiz-feedback" id="quizFeedback"></div>
+          <div class="quiz-footer">
+            <span class="quiz-score">得分 <strong id="scoreText">0 / 0</strong></span>
+            <button class="next-btn" id="nextQuestionBtn" disabled>下一題</button>
+          </div>
+        </div>
+        <div id="quizResultView" style="display:none;">
+          <div class="quiz-panel quiz-result">
+            <div class="big-score" id="finalScore">0 / 10</div>
+            <div class="result-msg" id="resultMsg"></div>
+            <button class="restart-btn" id="restartBtn">再測一次</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PHRASE (常用句) VIEW ============ -->
+  <section class="view" id="view-phrase">
+    <div class="phrase-toolbar">
+      <p class="section-label">依場景查看常用對話。滑鼠移到漢字上可看假名，點喇叭可播放發音</p>
+      <div class="phrase-toggle-group">
+        <button class="phrase-toggle-btn" id="toggleZh" data-on="false">中文</button>
+      </div>
+    </div>
+    <nav class="scene-tabbar" id="sceneTabbar"></nav>
+    <nav class="scenario-tabbar" id="scenarioTabbar"></nav>
+    <div class="play-all-row">
+      <button class="play-all-btn" id="playAllBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span id="playAllLabel">全部播放</span>
+      </button>
+    </div>
+    <div class="phrase-list" id="phraseList"></div>
+  </section>
+
+</main>
+
+<script>
+const VOCAB_DATA = {
+  nigiri_fish: { label: "握り・魚類", kana: "にぎり・さかな", items: [
+    { kanji: "マグロ（赤身）", kana: "まぐろ（あかみ）", zh: "鮪魚赤身（瘦肉部位）" },
+    { kanji: "中トロ", kana: "ちゅうとろ", zh: "中腹肉（半肥瘦）" },
+    { kanji: "大トロ", kana: "おおとろ", zh: "大腹肉（最肥美部位）" },
+    { kanji: "サーモン", kana: "さーもん", zh: "鮭魚" },
+    { kanji: "ハマチ", kana: "はまち", zh: "花鰭鰺（油甘魚幼魚）" },
+    { kanji: "ブリ", kana: "ぶり", zh: "鰤魚（成魚，油脂更豐厚）" },
+    { kanji: "カンパチ", kana: "かんぱち", zh: "紅甘（肉質清爽，油脂較少）" },
+    { kanji: "タイ", kana: "たい", zh: "鯛魚" },
+    { kanji: "ヒラメ", kana: "ひらめ", zh: "比目魚" },
+    { kanji: "エンガワ", kana: "えんがわ", zh: "比目魚鰭邊肉（油脂豐富）" },
+    { kanji: "カツオ", kana: "かつお", zh: "鰹魚" },
+    { kanji: "サバ", kana: "さば", zh: "鯖魚（常見醋漬）" },
+    { kanji: "アジ", kana: "あじ", zh: "竹莢魚" },
+    { kanji: "コハダ", kana: "こはだ", zh: "小鰭（醋漬小鯽魚）" },
+    { kanji: "キンメダイ", kana: "きんめだい", zh: "金目鯛" },
+    { kanji: "喉黒", kana: "のどぐろ", zh: "喉黑魚（油脂豐富的高級魚）" },
+    { kanji: "鰆", kana: "さわら", zh: "鰆魚（常見炙燒或醋漬）" },
+  ]},
+  nigiri_other: { label: "握り・貝類・甲殼・卵", kana: "にぎり・かいるい・たまご", items: [
+    { kanji: "タコ", kana: "たこ", zh: "章魚" },
+    { kanji: "イカ", kana: "いか", zh: "花枝（烏賊）" },
+    { kanji: "ホタテ", kana: "ほたて", zh: "干貝" },
+    { kanji: "甘エビ", kana: "あまえび", zh: "甜蝦" },
+    { kanji: "ボタンエビ", kana: "ぼたんえび", zh: "牡丹蝦" },
+    { kanji: "車エビ", kana: "くるまえび", zh: "明蝦（常見蒸煮）" },
+    { kanji: "大正エビ", kana: "たいしょうえび", zh: "大正蝦（常見蒸煮）" },
+    { kanji: "ウニ", kana: "うに", zh: "海膽" },
+    { kanji: "イクラ", kana: "いくら", zh: "鮭魚卵" },
+    { kanji: "玉子", kana: "たまご", zh: "玉子（甜蛋）握り" },
+    { kanji: "アナゴ", kana: "あなご", zh: "星鰻（穴子）" },
+  ]},
+  roll: { label: "巻物・軍艦・其他", kana: "まきもの・ぐんかん", items: [
+    { kanji: "鉄火巻き", kana: "てっかまき", zh: "鐵火捲（鮪魚捲）" },
+    { kanji: "かっぱ巻き", kana: "かっぱまき", zh: "河童捲（小黃瓜捲）" },
+    { kanji: "軍艦巻き", kana: "ぐんかんまき", zh: "軍艦捲" },
+    { kanji: "手巻き", kana: "てまき", zh: "手捲" },
+    { kanji: "ねぎとろ巻き", kana: "ねぎとろまき", zh: "蔥花鮪魚泥捲" },
+    { kanji: "新香巻き", kana: "しんこまき", zh: "醃黃蘿蔔捲" },
+    { kanji: "ちらし寿司", kana: "ちらしずし", zh: "散壽司" },
+    { kanji: "海鮮丼", kana: "かいせんどん", zh: "海鮮丼" },
+    { kanji: "茶碗蒸し", kana: "ちゃわんむし", zh: "茶碗蒸" },
+    { kanji: "お椀", kana: "おわん", zh: "湯品（清湯）" },
+    { kanji: "味噌汁", kana: "みそしる", zh: "味噌湯" },
+    { kanji: "巻き寿司", kana: "まきずし", zh: "壽司捲（一般捲物）" },
+  ]},
+  custom: { label: "板前用語・客製化", kana: "カスタマイズ", items: [
+    { kanji: "おまかせ", kana: "おまかせ", zh: "主廚精選（無菜單）" },
+    { kanji: "お好み", kana: "おこのみ", zh: "單點（自選）" },
+    { kanji: "わさび抜き", kana: "わさびぬき", zh: "不要山葵" },
+    { kanji: "わさび多め", kana: "わさびおおめ", zh: "山葵加多" },
+    { kanji: "醤油控えめ", kana: "しょうゆひかえめ", zh: "醬油少一點" },
+    { kanji: "シャリ小さめ", kana: "しゃりこさめ", zh: "飯量小一點" },
+    { kanji: "炙り", kana: "あぶり", zh: "炙燒" },
+    { kanji: "ガリ", kana: "がり", zh: "薑片（去腥）" },
+    { kanji: "塩で", kana: "しおで", zh: "用鹽吃（不沾醬油）" },
+    { kanji: "一本", kana: "いっぽん", zh: "一份（計量單位）" },
+  ]},
+  drink: { label: "飲料・甘味", kana: "ドリンク・かんみ", items: [
+    { kanji: "日本酒", kana: "にほんしゅ", zh: "日本酒" },
+    { kanji: "大吟醸", kana: "だいぎんじょう", zh: "大吟釀" },
+    { kanji: "焼酎", kana: "しょうちゅう", zh: "燒酎" },
+    { kanji: "生ビール", kana: "なまびーる", zh: "生啤酒" },
+    { kanji: "お茶", kana: "おちゃ", zh: "綠茶" },
+    { kanji: "烏龍茶", kana: "うーろんちゃ", zh: "烏龍茶" },
+    { kanji: "お冷", kana: "おひや", zh: "冰開水" },
+    { kanji: "甘味", kana: "かんみ", zh: "甜點" },
+    { kanji: "水菓子", kana: "みずがし", zh: "水果甜點" },
+    { kanji: "玉子焼き", kana: "たまごやき", zh: "厚燒蛋（甜點）" },
+  ]},
+};
+
+// 易混淆組
+const CONFUSE_GROUPS = [
+  {
+    title: "鮪魚等級：赤身 vs 中トロ vs 大トロ",
+    items: [
+      { kanji: "マグロ（赤身）", kana: "まぐろ（あかみ）", zh: "瘦肉部位，色澤鮮紅" },
+      { kanji: "中トロ", kana: "ちゅうとろ", zh: "半肥半瘦，油脂均衡" },
+      { kanji: "大トロ", kana: "おおとろ", zh: "最肥美部位，入口即化" },
+    ],
+  },
+  {
+    title: "蝦類：甘エビ vs ボタンエビ vs 大正エビ",
+    items: [
+      { kanji: "甘エビ", kana: "あまえび", zh: "生食用，鮮甜濕潤" },
+      { kanji: "ボタンエビ", kana: "ぼたんえび", zh: "體型大，口感彈牙細緻" },
+      { kanji: "大正エビ", kana: "たいしょうえび", zh: "常見蒸煮，肉質紮實" },
+    ],
+  },
+  {
+    title: "鰺魚類：ハマチ vs ブリ vs カンパチ",
+    items: [
+      { kanji: "ハマチ", kana: "はまち", zh: "幼魚，油脂適中" },
+      { kanji: "ブリ", kana: "ぶり", zh: "成魚，油脂更豐厚" },
+      { kanji: "カンパチ", kana: "かんぱち", zh: "肉質清爽，油脂較少" },
+    ],
+  },
+  {
+    title: "出菜方式：おまかせ vs お好み vs つまみ",
+    items: [
+      { kanji: "おまかせ", kana: "おまかせ", zh: "由師傅決定出菜順序與內容" },
+      { kanji: "お好み", kana: "おこのみ", zh: "客人自由單點想吃的握り" },
+      { kanji: "つまみ", kana: "つまみ", zh: "握り之外的下酒小菜" },
+    ],
+  },
+  {
+    title: "食材處理：漬け vs 〆る vs 炙り",
+    items: [
+      { kanji: "漬け", kana: "づけ", zh: "用醬油等醃漬提升風味" },
+      { kanji: "〆る", kana: "しめる", zh: "用鹽醋處理生魚以增添風味與保存" },
+      { kanji: "炙り", kana: "あぶり", zh: "用火稍微炙燒表面提升香氣" },
+    ],
+  },
+  {
+    title: "蛋類：玉子（握り） vs 玉子焼き",
+    items: [
+      { kanji: "玉子（握り）", kana: "たまご（にぎり）", zh: "壽司用甜蛋，鋪在醋飯上" },
+      { kanji: "玉子焼き", kana: "たまごやき", zh: "厚燒蛋，常作為甜點或前菜" },
+    ],
+  },
+];
+
+// 漢字詞 → 假名讀音字典（僅供常用句之假名提示使用）
+const KANJI_READINGS = [
+  ["予約", "よやく"],
+  ["お願い", "おねがい"],
+  ["今晩", "こんばん"],
+  ["八時", "はちじ"],
+  ["二名様", "にめいさま"],
+  ["二名", "にめい"],
+  ["大丈夫", "だいじょうぶ"],
+  ["本日", "ほんじつ"],
+  ["承ります", "うけたまわります"],
+  ["承知", "しょうち"],
+  ["お客様", "おきゃくさま"],
+  ["苦手", "にがて"],
+  ["食材", "しょくざい"],
+  ["貝類", "かいるい"],
+  ["少し", "すこし"],
+  ["来店", "らいてん"],
+  ["田中", "たなか"],
+  ["待ち", "まち"],
+  ["案内", "あんない"],
+  ["楽しみ", "たのしみ"],
+  ["喉黒", "のどぐろ"],
+  ["新子", "しんこ"],
+  ["甲殻類", "こうかくるい"],
+  ["除いて", "のぞいて"],
+  ["用意", "ようい"],
+  ["助かります", "たすかります"],
+  ["注文", "ちゅうもん"],
+  ["お好み", "おこのみ"],
+  ["お酒", "おさけ"],
+  ["飲み", "のみ"],
+  ["軽め", "かるめ"],
+  ["日本酒", "にほんしゅ"],
+  ["中トロ", "ちゅうとろ"],
+  ["一つ", "ひとつ"],
+  ["次", "つぎ"],
+  ["何という", "なんという"],
+  ["何", "なに"],
+  ["入荷", "にゅうか"],
+  ["美味しそう", "おいしそう"],
+  ["産地", "さんち"],
+  ["長崎", "ながさき"],
+  ["届いた", "とどいた"],
+  ["脂", "あぶら"],
+  ["乗って", "のって"],
+  ["魚", "さかな"],
+  ["鰆", "さわら"],
+  ["炙って", "あぶって"],
+  ["塩", "しお"],
+  ["食べた方", "たべたほう"],
+  ["方", "ほう"],
+  ["召し上がり", "めしあがり"],
+  ["少なめ", "すくなめ"],
+  ["控えめ", "ひかえめ"],
+  ["小さめ", "こさめ"],
+  ["醤油", "しょうゆ"],
+  ["食べます", "たべます"],
+  ["味", "あじ"],
+  ["辛口", "からくち"],
+  ["純米酒", "じゅんまいしゅ"],
+  ["合います", "あいます"],
+  ["冷や", "ひや"],
+  ["出し", "だし"],
+  ["美味しい", "おいしい"],
+  ["新鮮", "しんせん"],
+  ["今朝", "けさ"],
+  ["仕入れた", "しいれた"],
+  ["温度", "おんど"],
+  ["嬉しい", "うれしい"],
+  ["言葉", "ことば"],
+  ["会計", "かいけい"],
+  ["お会計", "おかいけい"],
+  ["少々", "しょうしょう"],
+  ["お待ちください", "おまちください"],
+  ["四万二千円", "よんまんにせんえん"],
+  ["料", "りょう"],
+  ["含まれて", "ふくまれて"],
+  ["料金", "りょうきん"],
+  ["分", "ぶん"],
+  ["入って", "はいって"],
+  ["代", "だい"],
+  ["含めて", "ふくめて"],
+  ["金額", "きんがく"],
+  ["今日", "きょう"],
+  ["美味しかった", "おいしかった"],
+  ["是非", "ぜひ"],
+  ["お越しください", "おこしください"],
+  ["伺います", "うかがいます"],
+  ["気をつけて", "きをつけて"],
+  ["帰り", "かえり"],
+  ["来る", "くる"],
+  ["来月", "らいげつ"],
+  ["秋刀魚", "さんま"],
+  ["時期", "じき"],
+  ["お待ちしております", "おまちしております"],
+];
+
+KANJI_READINGS.sort((a, b) => b[0].length - a[0].length);
+
+function buildFuriganaHTML(text) {
+  let result = '';
+  let i = 0;
+  while (i < text.length) {
+    let matched = false;
+    for (const [word, kana] of KANJI_READINGS) {
+      if (text.startsWith(word, i) && /[\u4E00-\u9FFF]/.test(word)) {
+        result += `<span class="furi" data-kana="${kana}">${word}</span>`;
+        i += word.length;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      result += text[i];
+      i += 1;
+    }
+  }
+  return result;
+}
+
+// 常用句：板前壽司店場景
+const PHRASE_DATA = {
+  reservation: {
+    label: "預約・入座與寒暄",
+    scenarios: [
+      {
+        label: "情境一：電話預約",
+        items: [
+          { speaker: "customer", jp: "予約をお願いしたいのですが、今晩八時に二名で大丈夫でしょうか。", kana: "よやくをおねがいしたいのですが、こんばんはちじにふたりでだいじょうぶでしょうか。", zh: "我想預約，今晚八點兩位可以嗎？" },
+          { speaker: "staff", jp: "かしこまりました。本日八時に二名様でご予約承ります。", kana: "かしこまりました。ほんじつはちじにふためいさまでごよやくうけたまわります。", zh: "好的，已為您預約今晚八點兩位。" },
+          { speaker: "staff", jp: "お苦手な食材はございますか？", kana: "おにがてなしょくざいはございますか？", zh: "有不敢吃的食材嗎？" },
+          { speaker: "customer", jp: "貝類が少し苦手です。", kana: "かいるいがすこしにがてです。", zh: "貝類我比較不敢吃。" },
+        ],
+      },
+      {
+        label: "情境二：到店與帶位",
+        items: [
+          { speaker: "staff", jp: "いらっしゃいませ。ご予約のお客様でしょうか。", kana: "いらっしゃいませ。ごよやくのおきゃくさまでしょうか。", zh: "歡迎光臨，請問是有預約的客人嗎？" },
+          { speaker: "customer", jp: "はい、八時に予約しています、田中です。", kana: "はい、はちじによやくしています、たなかです。", zh: "是的，預約八點，我姓田中。" },
+          { speaker: "staff", jp: "お待ちしておりました。カウンターへご案内します。", kana: "おまちしておりました。カウンターへごあんないします。", zh: "我們在等候您了，請往吧台這邊。" },
+          { speaker: "customer", jp: "よろしくお願いします。", kana: "よろしくおねがいします。", zh: "麻煩您了。" },
+        ],
+      },
+      {
+        label: "情境三：入座與開場寒暄",
+        items: [
+          { speaker: "staff", jp: "本日もご来店いただきありがとうございます。", kana: "ほんじつもごらいてんいただきありがとうございます。", zh: "感謝您今天再次光臨。" },
+          { speaker: "customer", jp: "楽しみにしていました。", kana: "たのしみにしていました。", zh: "我一直很期待。" },
+          { speaker: "staff", jp: "本日のおすすめは喉黒と新子でございます。", kana: "ほんじつのおすすめはのどぐろとしんこでございます。", zh: "今天的推薦是喉黑魚和新子鯽（初秋小鯽魚）。" },
+          { speaker: "customer", jp: "それは楽しみです。", kana: "それはたのしみです。", zh: "真令人期待。" },
+        ],
+      },
+      {
+        label: "情境四：詢問飲食禁忌與喜好",
+        items: [
+          { speaker: "staff", jp: "アレルギーや苦手な食材はございますか？", kana: "アレルギーやにがてなしょくざいはございますか？", zh: "有過敏或不敢吃的食材嗎？" },
+          { speaker: "customer", jp: "甲殻類のアレルギーがあります。", kana: "こうかくるいのアレルギーがあります。", zh: "我對甲殼類過敏。" },
+          { speaker: "staff", jp: "承知しました。エビとカニは除いてご用意します。", kana: "しょうちしました。エビとカニはのぞいてごよういします。", zh: "了解，會避開蝦和螃蟹幫您準備。" },
+          { speaker: "customer", jp: "ありがとうございます、助かります。", kana: "ありがとうございます、たすかります。", zh: "謝謝您，這樣我就放心了。" },
+        ],
+      },
+    ],
+  },
+  ordering: {
+    label: "點餐：おまかせ・お好み",
+    scenarios: [
+      {
+        label: "情境一：選擇おまかせ套餐",
+        items: [
+          { speaker: "staff", jp: "ご注文はおまかせとお好み、どちらになさいますか。", kana: "ごちゅうもんはおまかせとおこのみ、どちらになさいますか。", zh: "餐點要選主廚精選還是自由單點呢？" },
+          { speaker: "customer", jp: "おまかせでお願いします。", kana: "おまかせでおねがいします。", zh: "請給我主廚精選。" },
+          { speaker: "staff", jp: "かしこまりました。お酒はお飲みになりますか？", kana: "かしこまりました。おさけはおのみになりますか？", zh: "好的，需要搭配日本酒嗎？" },
+          { speaker: "customer", jp: "軽めの日本酒をお願いします。", kana: "かるめのにほんしゅをおねがいします。", zh: "請給我清爽一點的日本酒。" },
+        ],
+      },
+      {
+        label: "情境二：お好み單點",
+        items: [
+          { speaker: "customer", jp: "お好みでお願いします。まずは中トロをください。", kana: "おこのみでおねがいします。まずはちゅうとろをください。", zh: "我要自由單點，先給我中腹肉。" },
+          { speaker: "staff", jp: "中トロ一つですね。お次は何になさいますか。", kana: "ちゅうとろひとつですね。おつぎはなにになさいますか。", zh: "中腹肉一個，接下來想吃什麼呢？" },
+          { speaker: "customer", jp: "ウニとイクラもお願いします。", kana: "うにといくらもおねがいします。", zh: "也請給我海膽和鮭魚卵。" },
+          { speaker: "staff", jp: "承知しました、すぐにご用意します。", kana: "しょうちしました、すぐにごよういします。", zh: "了解，馬上為您準備。" },
+        ],
+      },
+      {
+        label: "情境三：師傅介紹當令食材",
+        items: [
+          { speaker: "staff", jp: "こちらは本日入荷した喉黒です。", kana: "こちらはほんじつにゅうかしたのどぐろです。", zh: "這是今天進貨的喉黑魚。" },
+          { speaker: "customer", jp: "美味しそうですね。どちらの産地ですか？", kana: "おいしそうですね。どちらのさんちですか？", zh: "看起來很好吃，是哪裡產的呢？" },
+          { speaker: "staff", jp: "長崎から届いたものです、脂が乗っています。", kana: "ながさきからとどいたものです、あぶらがのっています。", zh: "是從長崎送來的，油脂很豐富。" },
+          { speaker: "customer", jp: "それはぜひいただきたいです。", kana: "それはぜひいただきたいです。", zh: "那一定要嚐嚐看。" },
+        ],
+      },
+      {
+        label: "情境四：詢問食材與調味細節",
+        items: [
+          { speaker: "customer", jp: "これは何という魚ですか？", kana: "これはなんというさかなですか？", zh: "這是什麼魚呢？" },
+          { speaker: "staff", jp: "鰆です、少し炙ってあります。", kana: "さわらです、すこしあぶってあります。", zh: "這是鰆魚，稍微炙燒過。" },
+          { speaker: "customer", jp: "塩で食べた方がいいですか？", kana: "しおでたべたほうがいいですか？", zh: "用鹽吃會比較好嗎？" },
+          { speaker: "staff", jp: "はい、塩でお召し上がりください。", kana: "はい、しおでおめしあがりください。", zh: "是的，請用鹽享用。" },
+        ],
+      },
+    ],
+  },
+  dining: {
+    label: "用餐互動：客製化與對話",
+    scenarios: [
+      {
+        label: "情境一：客製化要求（山葵・醋飯）",
+        items: [
+          { speaker: "customer", jp: "わさびは少なめでお願いします。", kana: "わさびはすくなめでおねがいします。", zh: "山葵請幫我少一點。" },
+          { speaker: "staff", jp: "かしこまりました、わさび控えめにいたします。", kana: "かしこまりました、わさびひかえめにいたします。", zh: "好的，會幫您減少山葵的量。" },
+          { speaker: "customer", jp: "シャリも少し小さめにできますか？", kana: "しゃりもすこしこさめにできますか？", zh: "飯量也可以小一點嗎？" },
+          { speaker: "staff", jp: "もちろんです、シャリ小さめでご用意します。", kana: "もちろんです、しゃりこさめでごよういします。", zh: "當然可以，會幫您準備小一點的飯量。" },
+        ],
+      },
+      {
+        label: "情境二：詢問如何吃／吃法建議",
+        items: [
+          { speaker: "customer", jp: "これは醤油をつけて食べますか？", kana: "これはしょうゆをつけてたべますか？", zh: "這個要沾醬油吃嗎？" },
+          { speaker: "staff", jp: "ネタの方に少しだけつけてください。", kana: "ねたのほうにすこしだけつけてください。", zh: "請在魚肉那一面稍微沾一點就好。" },
+          { speaker: "customer", jp: "シャリにはつけない方がいいんですね。", kana: "しゃりにはつけないほうがいいんですね。", zh: "原來是不要沾到飯比較好。" },
+          { speaker: "staff", jp: "そうです、その方が味のバランスがいいです。", kana: "そうです、そのほうがあじのバランスがいいです。", zh: "沒錯，這樣味道的平衡會比較好。" },
+        ],
+      },
+      {
+        label: "情境三：加點飲料／酒",
+        items: [
+          { speaker: "customer", jp: "日本酒のおすすめはありますか？", kana: "にほんしゅのおすすめはありますか？", zh: "有推薦的日本酒嗎？" },
+          { speaker: "staff", jp: "辛口の純米酒がよく合いますよ。", kana: "からくちのじゅんまいしゅがよくあいますよ。", zh: "辛口的純米酒會很搭喔。" },
+          { speaker: "customer", jp: "それをお願いします。", kana: "それをおねがいします。", zh: "那麼請給我那個。" },
+          { speaker: "staff", jp: "冷やでお出ししますね。", kana: "ひやでおだししますね。", zh: "我會幫您冰涼上桌。" },
+        ],
+      },
+      {
+        label: "情境四：稱讚與互動聊天",
+        items: [
+          { speaker: "customer", jp: "とても美味しいです、ネタが新鮮ですね。", kana: "とてもおいしいです、ねたがしんせんですね。", zh: "非常好吃，魚肉很新鮮呢。" },
+          { speaker: "staff", jp: "ありがとうございます、今朝仕入れたものです。", kana: "ありがとうございます、けさしいれたものです。", zh: "謝謝您，是今天早上進貨的。" },
+          { speaker: "customer", jp: "シャリの温度もちょうどいいです。", kana: "しゃりのおんどもちょうどいいです。", zh: "醋飯的溫度也剛剛好。" },
+          { speaker: "staff", jp: "嬉しいお言葉です、ありがとうございます。", kana: "うれしいおことばです、ありがとうございます。", zh: "聽到這句話真開心，謝謝您。" },
+        ],
+      },
+    ],
+  },
+  paying: {
+    label: "結帳・致謝離開",
+    scenarios: [
+      {
+        label: "情境一：詢問結帳",
+        items: [
+          { speaker: "customer", jp: "すみません、お会計をお願いします。", kana: "すみません、おかいけいをおねがいします。", zh: "不好意思，請幫我結帳。" },
+          { speaker: "staff", jp: "かしこまりました、少々お待ちください。", kana: "かしこまりました、しょうしょうおまちください。", zh: "好的，請稍候。" },
+          { speaker: "staff", jp: "本日は二名様で四万二千円になります。", kana: "ほんじつはにめいさまでよんまんにせんえんになります。", zh: "今天兩位總共是四萬兩千日圓。" },
+          { speaker: "customer", jp: "カードでお願いします。", kana: "カードでおねがいします。", zh: "請用信用卡付款。" },
+        ],
+      },
+      {
+        label: "情境二：確認服務費／內容",
+        items: [
+          { speaker: "customer", jp: "サービス料は含まれていますか？", kana: "サービスりょうはふくまれていますか？", zh: "有包含服務費嗎？" },
+          { speaker: "staff", jp: "はい、料金にはすべて含まれております。", kana: "はい、りょうきんにはすべてふくまれております。", zh: "是的，金額已經全部包含在內了。" },
+          { speaker: "customer", jp: "お酒の分も入っていますか？", kana: "おさけのぶんもはいっていますか？", zh: "也包含酒的部分嗎？" },
+          { speaker: "staff", jp: "はい、お酒代も含めての金額です。", kana: "はい、おさけだいもふくめてのきんがくです。", zh: "是的，這個金額也包含了酒錢。" },
+        ],
+      },
+      {
+        label: "情境三：致謝與離開",
+        items: [
+          { speaker: "customer", jp: "今日はとても美味しかったです、ごちそうさまでした。", kana: "きょうはとてもおいしかったです、ごちそうさまでした。", zh: "今天真的很好吃，謝謝招待。" },
+          { speaker: "staff", jp: "ありがとうございました、また是非お越しください。", kana: "ありがとうございました、またぜひおこしください。", zh: "謝謝您，歡迎再次光臨。" },
+          { speaker: "customer", jp: "また伺います。", kana: "またうかがいます。", zh: "我會再來的。" },
+          { speaker: "staff", jp: "お気をつけてお帰りください。", kana: "おきをつけておかえりください。", zh: "請慢走，路上小心。" },
+        ],
+      },
+      {
+        label: "情境四：預約下次來訪",
+        items: [
+          { speaker: "customer", jp: "次はいつ頃来るのがおすすめですか？", kana: "つぎはいつごろくるのがおすすめですか？", zh: "下次大概什麼時候來比較好呢？" },
+          { speaker: "staff", jp: "来月は秋刀魚が美味しい時期になります。", kana: "らいげつはさんまがおいしいじきになります。", zh: "下個月正是秋刀魚最美味的季節。" },
+          { speaker: "customer", jp: "それでは来月また予約します。", kana: "それではらいげつまたよやくします。", zh: "那麼我下個月會再預約。" },
+          { speaker: "staff", jp: "お待ちしております、ありがとうございました。", kana: "おまちしております、ありがとうございました。", zh: "我們會等候您的光臨，謝謝您。" },
+        ],
+      },
+    ],
+  },
+};
+const PHRASE_KEYS = Object.keys(PHRASE_DATA);
+let currentPhraseScene = "reservation";
+let currentScenarioIndex = 0;
+
+const CAT_KEYS = Object.keys(VOCAB_DATA);
+let currentCat = "nigiri_fish";
+let currentMode = "ref";        // "ref" | "study"
+let refSubMode = "lookup";      // "lookup" | "confuse"
+let studySubMode = "memorize";  // "memorize" | "quiz"
+
+let studyOrder = [];
+let studyIndex = 0;
+let isFlipped = false;
+
+
+let quizQueue = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizAnswered = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function refreshCatTabbarVisibility() {
+  const needsCat = (currentMode === 'ref' && refSubMode === 'lookup') ||
+                    (currentMode === 'study' && (studySubMode === 'memorize' || studySubMode === 'quiz'));
+  document.getElementById('catTabbar').style.display = needsCat ? 'flex' : 'none';
+}
+
+/* ---------- top-level mode tabs ---------- */
+document.querySelectorAll('#modeTabbar .tab-item').forEach(tab => {
+  tab.addEventListener('click', () => {
+    stopPlayAll();
+    document.querySelectorAll('#modeTabbar .tab-item').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentMode = tab.dataset.mode;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + currentMode).classList.add('active');
+
+    refreshCatTabbarVisibility();
+    enterCurrentMode();
+  });
+});
+
+/* ---------- inner sub-mode tabs ---------- */
+document.getElementById('refInnerTabbar').addEventListener('click', (e) => {
+  const item = e.target.closest('.inner-tab-item');
+  if (!item) return;
+  document.querySelectorAll('#refInnerTabbar .inner-tab-item').forEach(t => t.classList.remove('active'));
+  item.classList.add('active');
+  refSubMode = item.dataset.submode;
+  document.querySelectorAll('#view-ref .inner-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('ref-' + refSubMode).classList.add('active');
+  refreshCatTabbarVisibility();
+  enterCurrentMode();
+});
+
+document.getElementById('studyInnerTabbar').addEventListener('click', (e) => {
+  const item = e.target.closest('.inner-tab-item');
+  if (!item) return;
+  document.querySelectorAll('#studyInnerTabbar .inner-tab-item').forEach(t => t.classList.remove('active'));
+  item.classList.add('active');
+  studySubMode = item.dataset.submode;
+  document.querySelectorAll('#view-study .inner-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('study-' + studySubMode).classList.add('active');
+  refreshCatTabbarVisibility();
+  enterCurrentMode();
+});
+
+/* ---------- dispatch ---------- */
+function enterCurrentMode() {
+  if (currentMode === 'ref') {
+    if (refSubMode === 'lookup') renderRef();
+    if (refSubMode === 'confuse') renderConfuse();
+  } else if (currentMode === 'study') {
+    if (studySubMode === 'memorize') initStudy();
+    if (studySubMode === 'quiz') initQuiz();
+  } else if (currentMode === 'phrase') {
+    renderPhrase();
+  }
+}
+
+/* ---------- category sub-tabs ---------- */
+function buildCatTabs() {
+  const bar = document.getElementById('catTabbar');
+  bar.innerHTML = '';
+  CAT_KEYS.forEach(key => {
+    const cat = VOCAB_DATA[key];
+    const el = document.createElement('div');
+    el.className = 'subtab-item' + (key === currentCat ? ' active' : '');
+    el.textContent = cat.label;
+    el.addEventListener('click', () => {
+      currentCat = key;
+      buildCatTabs();
+      enterCurrentMode();
+    });
+    bar.appendChild(el);
+  });
+}
+
+/* ================= REF (速査表) ================= */
+let currentFilter = "all";
+
+const FILTER_LABELS = {
+  all: "全部",
+};
+
+function getRefItems() {
+  const cat = VOCAB_DATA[currentCat];
+  if (currentFilter === "all") return cat.items;
+  return cat.items.filter(it => it.group === currentFilter);
+}
+
+function renderFilterRow() {
+  const cat = VOCAB_DATA[currentCat];
+  const row = document.getElementById('filterRow');
+  const groupsPresent = [...new Set(cat.items.filter(it => it.group).map(it => it.group))];
+
+  if (groupsPresent.length === 0) {
+    row.style.display = 'none';
+    row.innerHTML = '';
+    return;
+  }
+
+  row.style.display = 'flex';
+  row.innerHTML = '';
+  const options = ["all", ...groupsPresent];
+  options.forEach(key => {
+    const pill = document.createElement('div');
+    pill.className = 'filter-item' + (key === currentFilter ? ' active' : '');
+    pill.textContent = FILTER_LABELS[key] || key;
+    pill.addEventListener('click', () => {
+      currentFilter = key;
+      renderFilterRow();
+      renderRef(true);
+    });
+    row.appendChild(pill);
+  });
+}
+
+function renderRef(keepFilter) {
+  if (!keepFilter) currentFilter = "all";
+  renderFilterRow();
+
+  const items = getRefItems();
+  const grid = document.getElementById('refGrid');
+  grid.innerHTML = '';
+  items.forEach((item) => {
+    const cell = document.createElement('div');
+    cell.className = 'ref-cell';
+    cell.innerHTML = `<span class="ref-cell-kanji">${item.kanji}</span>`;
+    cell.addEventListener('click', () => {
+      const revealed = cell.classList.toggle('revealed');
+      cell.innerHTML = revealed
+        ? `<span class="ref-cell-kana">${item.kana}</span><span class="ref-cell-zh">${item.zh}</span>`
+        : `<span class="ref-cell-kanji">${item.kanji}</span>`;
+    });
+    grid.appendChild(cell);
+  });
+}
+
+/* ================= STUDY ================= */
+function initStudy() {
+  const cat = VOCAB_DATA[currentCat];
+  studyOrder = cat.items.map((_, i) => i);
+  studyIndex = 0;
+  isFlipped = false;
+  renderStudyCard();
+}
+
+function renderStudyCard() {
+  const cat = VOCAB_DATA[currentCat];
+  const item = cat.items[studyOrder[studyIndex]];
+  isFlipped = false;
+
+  document.getElementById('cardKanji').textContent = item.kanji;
+  document.getElementById('cardKana').textContent = item.kana;
+  document.getElementById('cardZh').textContent = '';
+  document.getElementById('cardHint').textContent = '點擊卡片看中文';
+
+  const pos = studyIndex + 1;
+  const total = studyOrder.length;
+  document.getElementById('cardIndexTag').textContent = `${pos} / ${total}`;
+  document.getElementById('navCounter').textContent = `${pos} / ${total}`;
+}
+
+document.getElementById('flashcard').addEventListener('click', () => {
+  const cat = VOCAB_DATA[currentCat];
+  const item = cat.items[studyOrder[studyIndex]];
+  isFlipped = !isFlipped;
+  document.getElementById('cardZh').textContent = isFlipped ? item.zh : '';
+  document.getElementById('cardHint').textContent = isFlipped ? '點擊卡片隱藏中文' : '點擊卡片看中文';
+});
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  studyIndex = (studyIndex + 1) % studyOrder.length;
+  renderStudyCard();
+});
+document.getElementById('prevBtn').addEventListener('click', () => {
+  studyIndex = (studyIndex - 1 + studyOrder.length) % studyOrder.length;
+  renderStudyCard();
+});
+document.getElementById('shuffleBtn').addEventListener('click', () => {
+  studyOrder = shuffle(studyOrder);
+  studyIndex = 0;
+  renderStudyCard();
+});
+
+/* ================= QUIZ ================= */
+function initQuiz() {
+  const cat = VOCAB_DATA[currentCat];
+  quizQueue = shuffle(cat.items.map((_, i) => i));
+  quizIndex = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  document.getElementById('quizContent').style.display = 'block';
+  document.getElementById('quizResultView').style.display = 'none';
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const cat = VOCAB_DATA[currentCat];
+  const itemIdx = quizQueue[quizIndex];
+  const item = cat.items[itemIdx];
+  quizAnswered = false;
+
+  document.getElementById('quizKanji').textContent = item.kanji;
+  document.getElementById('quizKana').textContent = item.kana;
+  document.getElementById('quizFeedback').textContent = '';
+  document.getElementById('nextQuestionBtn').disabled = true;
+
+  const pool = cat.items.filter((_, i) => i !== itemIdx).map(x => x.zh);
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([item.zh, ...wrongs]);
+
+  const optWrap = document.getElementById('quizOptions');
+  optWrap.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => handleAnswer(btn, opt, item.zh));
+    optWrap.appendChild(btn);
+  });
+
+  document.getElementById('scoreText').textContent = `${quizScore} / ${quizIndex}`;
+}
+
+function handleAnswer(btn, chosen, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    quizScore++;
+    document.getElementById('quizFeedback').textContent = '答對了';
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.quiz-option').forEach(b => { if (b.textContent === correct) b.classList.add('correct'); });
+    document.getElementById('quizFeedback').textContent = `正確答案：${correct}`;
+  }
+  document.getElementById('scoreText').textContent = `${quizScore} / ${quizIndex + 1}`;
+  document.getElementById('nextQuestionBtn').disabled = false;
+}
+
+document.getElementById('nextQuestionBtn').addEventListener('click', () => {
+  quizIndex++;
+  if (quizIndex >= quizQueue.length) {
+    showQuizResult();
+  } else {
+    renderQuizQuestion();
+  }
+});
+
+function showQuizResult() {
+  document.getElementById('quizContent').style.display = 'none';
+  document.getElementById('quizResultView').style.display = 'block';
+  const total = quizQueue.length;
+  document.getElementById('finalScore').textContent = `${quizScore} / ${total}`;
+  let msg = '繼續加油，多複習幾次吧';
+  const ratio = quizScore / total;
+  if (ratio === 1) msg = '完美，這個分類已經記熟了';
+  else if (ratio >= 0.8) msg = '很不錯，幾乎全對';
+  else if (ratio >= 0.5) msg = '還可以，再複習一輪會更熟練';
+  document.getElementById('resultMsg').textContent = msg;
+}
+
+document.getElementById('restartBtn').addEventListener('click', initQuiz);
+
+/* ================= CONFUSE ================= */
+function renderConfuse() {
+  const wrap = document.getElementById('confuseList');
+  wrap.innerHTML = '';
+  CONFUSE_GROUPS.forEach(group => {
+    const row = document.createElement('div');
+    row.className = 'confuse-row';
+    const itemsHtml = group.items.map(it =>
+      `<div class="confuse-pill"><span class="k">${it.kanji}（${it.kana}）</span><span class="z">${it.zh}</span></div>`
+    ).join('');
+    row.innerHTML = `<div class="confuse-title">${group.title}</div><div class="confuse-items">${itemsHtml}</div>`;
+    wrap.appendChild(row);
+  });
+}
+
+/* ================= PHRASE (常用句) ================= */
+const SPEAKER_LABELS = { staff: "師傅", customer: "客人" };
+
+function buildSceneTabs() {
+  const bar = document.getElementById('sceneTabbar');
+  bar.innerHTML = '';
+  PHRASE_KEYS.forEach(key => {
+    const scene = PHRASE_DATA[key];
+    const el = document.createElement('div');
+    el.className = 'scene-tab-item' + (key === currentPhraseScene ? ' active' : '');
+    el.textContent = scene.label;
+    el.addEventListener('click', () => {
+      stopPlayAll();
+      currentPhraseScene = key;
+      currentScenarioIndex = 0;
+      buildSceneTabs();
+      buildScenarioTabs();
+      renderPhraseList();
+    });
+    bar.appendChild(el);
+  });
+}
+
+function buildScenarioTabs() {
+  const scene = PHRASE_DATA[currentPhraseScene];
+  const bar = document.getElementById('scenarioTabbar');
+  bar.innerHTML = '';
+  scene.scenarios.forEach((scenario, i) => {
+    const el = document.createElement('div');
+    el.className = 'scenario-tab-item' + (i === currentScenarioIndex ? ' active' : '');
+    el.textContent = scenario.label;
+    el.addEventListener('click', () => {
+      stopPlayAll();
+      currentScenarioIndex = i;
+      buildScenarioTabs();
+      renderPhraseList();
+    });
+    bar.appendChild(el);
+  });
+}
+
+const SPEAKER_ICON_SVG = `
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+    <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+    <path d="M18 6a8.5 8.5 0 0 1 0 12"></path>
+  </svg>
+`;
+
+function renderPhraseList() {
+  const scene = PHRASE_DATA[currentPhraseScene];
+  const scenario = scene.scenarios[currentScenarioIndex];
+  const list = document.getElementById('phraseList');
+  list.innerHTML = '';
+  scenario.items.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'phrase-row ' + item.speaker;
+    row.innerHTML = `
+      <span class="speaker-tag">${SPEAKER_LABELS[item.speaker]}</span>
+      <div class="phrase-bubble">
+        <div class="phrase-jp-row">
+          <span class="phrase-jp">${buildFuriganaHTML(item.jp)}</span>
+          <button class="speak-btn" type="button" aria-label="播放發音" title="播放發音">${SPEAKER_ICON_SVG}</button>
+        </div>
+        <div class="phrase-zh">${item.zh}</div>
+      </div>
+    `;
+
+    row.querySelectorAll('.furi').forEach(furiEl => {
+      let pressTimer = null;
+      furiEl.addEventListener('touchstart', () => {
+        pressTimer = setTimeout(() => furiEl.classList.add('show-tooltip'), 350);
+      });
+      furiEl.addEventListener('touchend', () => {
+        clearTimeout(pressTimer);
+        setTimeout(() => furiEl.classList.remove('show-tooltip'), 1200);
+      });
+    });
+
+    const speakBtn = row.querySelector('.speak-btn');
+    speakBtn.addEventListener('click', () => {
+      stopPlayAll();
+      speakJapanese(item.jp, speakBtn, item.speaker);
+    });
+
+    list.appendChild(row);
+  });
+}
+
+// 依說話者給予不同音調與速度，讓師傅／客人聲音明顯不同
+// staff: 男性聲音、稍低沉、語速正常；customer: 女性聲音、稍高、語速正常
+const VOICE_PROFILE = {
+  staff:    { pitch: 0.95, rate: 0.97 },
+  customer: { pitch: 1.08, rate: 1.0 },
+};
+
+let jaVoices = [];
+function loadJaVoices() {
+  if (!('speechSynthesis' in window)) return;
+  const all = window.speechSynthesis.getVoices();
+  jaVoices = all.filter(v => v.lang && v.lang.toLowerCase().startsWith('ja'));
+}
+if ('speechSynthesis' in window) {
+  loadJaVoices();
+  window.speechSynthesis.onvoiceschanged = loadJaVoices;
+}
+
+function pickJaVoice(speaker) {
+  if (jaVoices.length === 0) return null;
+  if (jaVoices.length === 1) return jaVoices[0];
+  // 常見日文男聲/女聲語音名稱線索（不同瀏覽器/系統命名不同，盡量覆蓋常見情況）
+  const maleHints = ['male', 'man', 'otoko', '男', 'otoya', 'ichiro', 'kenji', 'hattori', 'sora'];
+  const femaleHints = ['female', 'woman', 'onna', '女', 'kyoko', 'o-ren', 'haruka', 'ayumi', 'sayaka', 'nanami', 'mei'];
+  const lowerNamed = v => v.name.toLowerCase();
+  const males = jaVoices.filter(v => maleHints.some(h => lowerNamed(v).includes(h)));
+  const females = jaVoices.filter(v => femaleHints.some(h => lowerNamed(v).includes(h)));
+  if (speaker === 'staff' && males.length) return males[0];
+  if (speaker === 'customer' && females.length) return females[0];
+  // 找不到明確性別線索時，師傅固定用第一個語音，客人固定用第二個（若有），
+  // 確保兩者語音來源不同，而不是只靠 pitch 強行扭曲同一語音
+  if (jaVoices.length >= 2) {
+    return speaker === 'staff' ? jaVoices[0] : jaVoices[1];
+  }
+  return jaVoices[0];
+}
+
+function speakJapanese(text, btn, speaker, onEnd) {
+  if (!('speechSynthesis' in window)) {
+    alert('您的瀏覽器不支援語音播放功能');
+    if (onEnd) onEnd();
+    return;
+  }
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'ja-JP';
+  const profile = VOICE_PROFILE[speaker] || { pitch: 1, rate: 0.95 };
+  utter.pitch = profile.pitch;
+  utter.rate = profile.rate;
+  const voice = pickJaVoice(speaker);
+  if (voice) utter.voice = voice;
+
+  if (btn) {
+    document.querySelectorAll('.speak-btn.playing').forEach(b => b.classList.remove('playing'));
+    btn.classList.add('playing');
+  }
+  const finish = () => {
+    if (btn) btn.classList.remove('playing');
+    if (onEnd) onEnd();
+  };
+  utter.onend = finish;
+  utter.onerror = finish;
+
+  window.speechSynthesis.speak(utter);
+}
+
+/* ---------- 全部播放（依序播放當前情境所有例句） ---------- */
+let playAllActive = false;
+let playAllQueue = [];
+let playAllIdx = 0;
+
+function stopPlayAll() {
+  playAllActive = false;
+  playAllQueue = [];
+  playAllIdx = 0;
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  document.querySelectorAll('.phrase-row.speaking').forEach(r => r.classList.remove('speaking'));
+  document.querySelectorAll('.speak-btn.playing').forEach(b => b.classList.remove('playing'));
+  const btn = document.getElementById('playAllBtn');
+  const label = document.getElementById('playAllLabel');
+  if (btn) btn.classList.remove('active');
+  if (label) label.textContent = '全部播放';
+}
+
+function playAllNext() {
+  if (!playAllActive) return;
+  if (playAllIdx >= playAllQueue.length) {
+    stopPlayAll();
+    return;
+  }
+  const { row, item } = playAllQueue[playAllIdx];
+  document.querySelectorAll('.phrase-row.speaking').forEach(r => r.classList.remove('speaking'));
+  row.classList.add('speaking');
+  row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const speakBtn = row.querySelector('.speak-btn');
+  speakJapanese(item.jp, speakBtn, item.speaker, () => {
+    playAllIdx++;
+    playAllNext();
+  });
+}
+
+function startPlayAll() {
+  const rows = Array.from(document.querySelectorAll('#phraseList .phrase-row'));
+  const scene = PHRASE_DATA[currentPhraseScene];
+  const scenario = scene.scenarios[currentScenarioIndex];
+  playAllQueue = rows.map((row, i) => ({ row, item: scenario.items[i] }));
+  playAllIdx = 0;
+  playAllActive = true;
+  const btn = document.getElementById('playAllBtn');
+  const label = document.getElementById('playAllLabel');
+  if (btn) btn.classList.add('active');
+  if (label) label.textContent = '停止播放';
+  playAllNext();
+}
+
+document.getElementById('playAllBtn').addEventListener('click', () => {
+  if (playAllActive) {
+    stopPlayAll();
+  } else {
+    startPlayAll();
+  }
+});
+
+function renderPhrase() {
+  buildSceneTabs();
+  buildScenarioTabs();
+  renderPhraseList();
+}
+
+document.getElementById('toggleZh').addEventListener('click', (e) => {
+  const isOn = e.target.dataset.on === 'true';
+  e.target.dataset.on = String(!isOn);
+  document.body.classList.toggle('show-zh', !isOn);
+});
+
+/* ---------- theme toggle ---------- */
+const SUN_PATH = `
+  <circle cx="12" cy="12" r="4.5"></circle>
+  <line x1="12" y1="2.5" x2="12" y2="5"></line>
+  <line x1="12" y1="19" x2="12" y2="21.5"></line>
+  <line x1="4.2" y1="4.2" x2="6" y2="6"></line>
+  <line x1="18" y1="18" x2="19.8" y2="19.8"></line>
+  <line x1="2.5" y1="12" x2="5" y2="12"></line>
+  <line x1="19" y1="12" x2="21.5" y2="12"></line>
+  <line x1="4.2" y1="19.8" x2="6" y2="18"></line>
+  <line x1="18" y1="6" x2="19.8" y2="4.2"></line>
+`;
+const MOON_PATH = `<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"></path>`;
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeIcon').innerHTML = theme === 'dark' ? MOON_PATH : SUN_PATH;
+}
+
+const savedTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+applyTheme(savedTheme);
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+});
+
+/* ---------- init ---------- */
+buildCatTabs();
+renderRef();
+</script>
+
+</body>
+</html>
