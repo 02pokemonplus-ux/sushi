@@ -295,6 +295,35 @@
   .shuffle-btn:hover { border-color: var(--indigo); color: var(--indigo); }
 
   /* ====== Reference table view ====== */
+  .ref-toolbar-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 4px;
+  }
+  .ref-toolbar-row .section-label { margin-bottom: 0; }
+
+  .ref-toggle-btn {
+    padding: 7px 16px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    flex-shrink: 0;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .ref-toggle-btn:hover { border-color: var(--indigo); color: var(--ink); }
+  .ref-toggle-btn[data-on="true"] {
+    background: var(--indigo);
+    border-color: var(--indigo);
+    color: var(--on-accent);
+    font-weight: 700;
+  }
+
   .filter-row {
     display: flex;
     gap: 10px;
@@ -349,6 +378,9 @@
   }
   .ref-cell-kana { font-size: 13px; color: var(--ink-soft); }
   .ref-cell-zh { font-size: 16px; font-weight: 700; color: var(--ink); }
+
+  .ref-grid.zh-pinned .ref-cell { cursor: default; }
+  .ref-grid.zh-pinned .ref-cell:hover { border-color: var(--line); }
 
   /* ====== Quiz view ====== */
   .quiz-wrap { max-width: 560px; margin: 0 auto; }
@@ -744,7 +776,10 @@
 
     <!-- 查詢子視圖 -->
     <div class="inner-view active" id="ref-lookup">
-      <p class="section-label">點擊單字查看假名與中文意思</p>
+      <div class="ref-toolbar-row">
+        <p class="section-label" id="refLookupHint">點擊單字查看假名與中文意思</p>
+        <button class="ref-toggle-btn" id="toggleRefZh" data-on="false">全顯示</button>
+      </div>
       <div class="filter-row" id="filterRow" style="display:none;"></div>
       <div class="ref-grid" id="refGrid"></div>
     </div>
@@ -1390,26 +1425,44 @@ function renderFilterRow() {
   });
 }
 
+let refZhPinned = false;
+
 function renderRef(keepFilter) {
   if (!keepFilter) currentFilter = "all";
   renderFilterRow();
 
   const items = getRefItems();
   const grid = document.getElementById('refGrid');
+  grid.classList.toggle('zh-pinned', refZhPinned);
   grid.innerHTML = '';
   items.forEach((item) => {
     const cell = document.createElement('div');
     cell.className = 'ref-cell';
-    cell.innerHTML = `<span class="ref-cell-kanji">${item.kanji}</span>`;
-    cell.addEventListener('click', () => {
-      const revealed = cell.classList.toggle('revealed');
-      cell.innerHTML = revealed
-        ? `<span class="ref-cell-kana">${item.kana}</span><span class="ref-cell-zh">${item.zh}</span>`
-        : `<span class="ref-cell-kanji">${item.kanji}</span>`;
-    });
+    if (refZhPinned) {
+      cell.classList.add('revealed');
+      cell.innerHTML = `<span class="ref-cell-kanji">${item.kanji}</span><span class="ref-cell-kana">${item.kana}</span><span class="ref-cell-zh">${item.zh}</span>`;
+    } else {
+      cell.innerHTML = `<span class="ref-cell-kanji">${item.kanji}</span>`;
+      cell.addEventListener('click', () => {
+        const revealed = cell.classList.toggle('revealed');
+        cell.innerHTML = revealed
+          ? `<span class="ref-cell-kana">${item.kana}</span><span class="ref-cell-zh">${item.zh}</span>`
+          : `<span class="ref-cell-kanji">${item.kanji}</span>`;
+      });
+    }
     grid.appendChild(cell);
   });
 }
+
+document.getElementById('toggleRefZh').addEventListener('click', (e) => {
+  const isOn = e.target.dataset.on === 'true';
+  refZhPinned = !isOn;
+  e.target.dataset.on = String(refZhPinned);
+  document.getElementById('refLookupHint').textContent = refZhPinned
+    ? '已顯示全部假名與中文意思'
+    : '點擊單字查看假名與中文意思';
+  renderRef(true);
+});
 
 /* ================= STUDY ================= */
 function initStudy() {
